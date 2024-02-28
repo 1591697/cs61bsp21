@@ -147,7 +147,7 @@ return getRecursive(pos +1,index,x.next);
             wizPos = 0;
         }
         public boolean hasNext(){
-            return size<wizPos;
+            return size>wizPos;
         }
         public T next(){
             T item = get(wizPos);
@@ -168,10 +168,13 @@ return getRecursive(pos +1,index,x.next);
             return false;
         }
         Deque<T> oa=(Deque<T>) o;
-        if(this.size()!=oa.size()){
+        if(this.size() != oa.size()){
             return false;    }
-        for(int i=0;i<oa.size();i++){
-            if(oa.get(i)!=this.get(i)){
+        for(int i = 0;i<oa.size();i++){
+            if(oa.get(i).equals(this.get(i))){
+                return true;
+            }
+            else {
                 return false;
             }
         }

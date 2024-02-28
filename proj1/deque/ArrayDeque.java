@@ -153,7 +153,7 @@ public class ArrayDeque <T> implements Deque<T>{
         }
         else {
             if (head == arr.length - 1) {
-                return arr[0];
+                return arr[index];
             }
 
             return arr[(index + head + 1) % arr.length];
@@ -378,7 +378,7 @@ public class ArrayDeque <T> implements Deque<T>{
             wizPos = 0;
         }
         public boolean hasNext(){
-return size<wizPos;
+                return size>wizPos;
         }
         public T next(){
             T item = get(wizPos);
@@ -402,14 +402,33 @@ return size<wizPos;
         if(this.size()!=oa.size()){
             return false;    }
         for(int i=0;i<oa.size();i++){
-            if(oa.get(i)!=this.get(i)){
+            if(oa.get(i).equals(this.get(i))){
+                return true;
+            }
+            else {
                 return false;
             }
         }
         return true;
     }
     public static void main(String[] args) {
-
+        ArrayDeque<Integer> ArrayDeque=new ArrayDeque<>();
+        ArrayDeque.addLast(0);
+        ArrayDeque.addLast(1);
+        ArrayDeque.addLast(2);
+        ArrayDeque.addFirst(3);
+        ArrayDeque.removeLast()     ;
+        ArrayDeque.addLast(5);
+        ArrayDeque.removeLast()     ;
+        ArrayDeque.addFirst(7);
+        ArrayDeque.addLast(8);
+        ArrayDeque.removeFirst()     ;
+        ArrayDeque.addFirst(10);
+        ArrayDeque.get(2)      ;
+        ArrayDeque.get(4)      ;
+        ArrayDeque.get(0)      ;
+        ArrayDeque.removeFirst()    ;
+        System.out.println(ArrayDeque.get(1));
    }
 
 

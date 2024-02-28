@@ -2,7 +2,7 @@ package deque;
 
 import java.util.Iterator;
 
-public  class  LinkedListDeque<T>implements Deque<T> {
+public  class  LinkedListDeque<T>implements Deque<T> ,Iterable<T>{
     class  node{ private T item;
         private   node pre;
         private   node next;
@@ -140,7 +140,7 @@ return getRecursive(pos +1,index,x.next);
     public Iterator<T> iterator() {
         return new DequeIterator();
     }
-    public class DequeIterator implements Iterator<T>{
+    private class DequeIterator implements Iterator<T>{
         private int wizPos;
 
         private DequeIterator() {

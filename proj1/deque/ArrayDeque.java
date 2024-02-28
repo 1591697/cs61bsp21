@@ -3,7 +3,7 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque <T> implements Deque<T>{
+public class ArrayDeque <T> implements Deque<T> , Iterable<T>{
      private T[] arr;
     private  int head ;
     private  int tail;
@@ -11,7 +11,7 @@ public class ArrayDeque <T> implements Deque<T>{
 
 
 
-    public void resize(){
+    private void resize(){
         T[] a=(T[])new Object[arr.length*2];
 //            for(int i = 0;i < arr.length;i++){
 //                if(head+i < arr.length)
@@ -30,7 +30,7 @@ public class ArrayDeque <T> implements Deque<T>{
 
             arr = a;
     }
-    public void rresize(){
+    private void rresize(){
         T[] a=(T[])new Object[arr.length/2];
         int k=0;
 //            for(int i = 0;i < arr.length;i++){
@@ -371,7 +371,7 @@ public class ArrayDeque <T> implements Deque<T>{
     public Iterator<T> iterator() {
         return new ArrayDequeIterator();
     }
-    public class ArrayDequeIterator implements Iterator<T>{
+    private class ArrayDequeIterator implements Iterator<T>{
         private int wizPos;
 
         private ArrayDequeIterator() {
@@ -411,25 +411,7 @@ public class ArrayDeque <T> implements Deque<T>{
         }
         return true;
     }
-    public static void main(String[] args) {
-        ArrayDeque<Integer> ArrayDeque=new ArrayDeque<>();
-        ArrayDeque.addLast(0);
-        ArrayDeque.addLast(1);
-        ArrayDeque.addLast(2);
-        ArrayDeque.addFirst(3);
-        ArrayDeque.removeLast()     ;
-        ArrayDeque.addLast(5);
-        ArrayDeque.removeLast()     ;
-        ArrayDeque.addFirst(7);
-        ArrayDeque.addLast(8);
-        ArrayDeque.removeFirst()     ;
-        ArrayDeque.addFirst(10);
-        ArrayDeque.get(2)      ;
-        ArrayDeque.get(4)      ;
-        ArrayDeque.get(0)      ;
-        ArrayDeque.removeFirst()    ;
-        System.out.println(ArrayDeque.get(1));
-   }
+
 
 
 }

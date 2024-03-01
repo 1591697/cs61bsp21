@@ -1,8 +1,10 @@
 package capers;
 
 import java.io.File;
-import static capers.Utils.*;
 
+import static capers.Dog.fromFile;
+import static capers.Utils.*;
+import static capers.Dog.DOG_FOLDER;
 /** A repository for Capers 
  * @author TODO
  * The structure of a Capers Repository is as follows:
@@ -18,7 +20,7 @@ public class CapersRepository {
     static final File CWD = new File(System.getProperty("user.dir"));
 
     /** Main metadata folder. */
-    static final File CAPERS_FOLDER = null; // TODO Hint: look at the `join`
+    static final File CAPERS_FOLDER = Utils.join(CWD,".capers"); // TODO Hint: look at the `join`
                                             //      function in Utils
 
     /**
@@ -32,6 +34,14 @@ public class CapersRepository {
      */
     public static void setupPersistence() {
         // TODO
+    if(!CAPERS_FOLDER.exists()){
+        boolean s=CAPERS_FOLDER.mkdir();//既有创建一个文件夹，并判断它是否成功
+        if(!s){
+             throw new java.lang.Error("Cannot create directory");//抛出一个新定义的异常。
+        }
+    }
+
+
     }
 
     /**
@@ -41,6 +51,16 @@ public class CapersRepository {
      */
     public static void writeStory(String text) {
         // TODO
+        File story = Utils.join(CAPERS_FOLDER, "story.txt");
+        if(story.exists()){
+        String pres=Utils.readContentsAsString(story);
+        text = pres +'\n' +text;
+        }
+
+            Utils.writeContents(story, text);
+            System.out.println(text);
+
+
     }
 
     /**
@@ -50,6 +70,9 @@ public class CapersRepository {
      */
     public static void makeDog(String name, String breed, int age) {
         // TODO
+        Dog dog=new Dog(name,breed,age);
+        dog.saveDog();
+        System.out.println(dog);
     }
 
     /**
@@ -60,5 +83,13 @@ public class CapersRepository {
      */
     public static void celebrateBirthday(String name) {
         // TODO
+       Dog d=fromFile(name);
+        if (d == null) {
+            throw new java.lang.Error("Dog is not exist");
+        }
+       d.haveBirthday();
+       d.saveDog();
+
+
     }
 }

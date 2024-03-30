@@ -42,18 +42,21 @@ public class Dog implements Serializable{ // TODO
      */
     public static Dog fromFile(String name) {
         // TODO (hint: look at the Utils file)
-//File f =Utils.join(DOG_FOLDER,name+".txt");
-//if(f.exists()){
-//    return  Utils.readObject(f,Dog);
-//
-//}
-//        return null;
-        File path=Utils.join(DOG_FOLDER,name+".txt");
-        if(path.exists()){
-            return Utils.readObject(path,Dog.class);
-        }else{
-            return null;
-        }
+        File f =Utils.join(DOG_FOLDER,name+".txt");
+        if(f.exists()){
+        return  Utils.readObject(f,Dog.class);
+
+}
+else{
+
+       return null;
+}
+//        File path=Utils.join(DOG_FOLDER,name+".txt");
+//        if(path.exists()){
+//            return Utils.readObject(path,Dog.class);
+//        }else{
+//            return null;
+//        }
     }
 
     /**

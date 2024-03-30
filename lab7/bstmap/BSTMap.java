@@ -2,6 +2,7 @@ package bstmap;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Stack;
 
 public class BSTMap<K extends Comparable,V> implements Map61B<K,V>  {
 
@@ -124,7 +125,34 @@ return size;
     }
 
     public Iterator<K> iterator() {
-     throw new UnsupportedOperationException();
+       return new BSTmapiterator();
+
+    }
+    private   class BSTmapiterator implements  Iterator<K>{
+        Stack<Node> t=new Stack<>();
+public void BSTmapiterator(){
+    BSTmappush(root);
+//使用stack
+
+}public void BSTmappush(Node node){
+    if(node!=null){
+        t.push(node);
+        BSTmappush(node.left);
+    }
+        }
+       public boolean hasNext(){
+        if(t.isEmpty()){
+            return false;
+        }
+        return true;
+       }
+       public K next(){
+    Node f=new Node();
+    f=t.pop();
+   BSTmappush(f.right);
+   return f.key;
+       }
+
     }
     public static void main(String args[]){
 

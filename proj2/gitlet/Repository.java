@@ -1013,6 +1013,13 @@ File f=new File(CWD+"/"+name);
         mergecommit(nids,branchname);
 
     }
+    public static void checkinit(){
+        File f=new File(CWD+"/"+".gitlet");
+        if(f.exists()){
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
+    }
     public static void main(String[] args) throws IOException {
 
     }

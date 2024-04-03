@@ -33,7 +33,7 @@ public class Blob implements Serializable {
     //得到SHA1
     public String GetBlobSHA1() {
         bytes=Utils.readContents(filecontent);
-        return Utils.sha1( bytes);
+        return Utils.sha1( bytes,name);
     }
 
     // File f=Utils.join(OBJECTS_DIR,id.substring(0,2));

@@ -26,47 +26,45 @@ public class Main {
                 // TODO: handle the `init` command
             case "add":
                 validArgs(args, 2);
-                Repository.checkinit();
-                if(args.length==2){
-                    Repository.add(args[1]);
-                }
-                // TODO: handle the `add [filename]` command
 
+                    Repository.add(args[1]);
+
+                // TODO: handle the `add [filename]` command
                 break;
             case "commit":
                 validArgs(args, 2);
-                Repository.checkinit();
+
                Repository.commit(args[1]);
                 break;
             // TODO: FILL THE REST IN
 
             case "rm":
                 validArgs(args, 2);
-                Repository.checkinit();
+
                 Repository.rmFile(args[1]);
                 break;
             case "log":
                 validArgs(args, 1);
-                Repository.checkinit();
+
                 Repository.log();
                 break;
             case "global-log":
                 validArgs(args, 1);
-                Repository.checkinit();
+
                 Repository.global_log(COMMIT_DIR);
                 break;
             case "find":
                 validArgs(args, 2);
-                Repository.checkinit();
+
                 Repository.find(args[1]);
                 break;
             case "status":
                 validArgs(args, 1);
-                Repository.checkinit();
+
                 Repository.status();
                 break;
             case "checkout":
-                Repository.checkinit();
+
                 if (args.length == 3) {
                     if (!args[1].equals("--")) {
                         System.out.println("Incorrect operands.");
@@ -99,23 +97,23 @@ public class Main {
                 break;
             case "branch":
                 validArgs(args, 2);
-                Repository.checkinit();
+
 
                 Repository.Creatbranch(args[1]);
                 break;
             case "rm-branch":
                 validArgs(args, 2);
-                Repository.checkinit();
+
                 Repository.detelebranch(args[1]);
                 break;
             case "reset":
                 validArgs(args, 2);
-                Repository.checkinit();
+
                 Repository.reset(args[1]);
                 break;
             case "merge":
                 validArgs(args, 2);
-                Repository.checkinit();
+
                 Repository.merge(args[1]);
                 break;
 

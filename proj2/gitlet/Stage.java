@@ -24,6 +24,47 @@ public class Stage implements Serializable {
         WriteAddToIndex();
 
 }
+    public  Stage(List<String> bis) throws IOException {
+        WriteAddToIndex();
+        WriteBidsToIndex(bis);
+    }
+//得到index的名字
+    public HashMap<String,String> indexNameMap(){
+        HashMap<String,String> hs=new HashMap<>();
+        for(String id:index){
+            Blob b=Utils.readObject(new File(BLOB_DIR+"/"+id.substring(0,6)+"/"+id),Blob.class);
+            hs.put(b.GetName(),b.GetId());
+        }
+        return hs;
+    }
+//得到父辈的bids
+    public void WriteBidsToIndex(List<String> Bids){
+        //删remove里面的
+        File f1=new File(REMOVW_FILE.getAbsolutePath());
+        HashSet<String>hs2=new HashSet<>();
+        String a=Utils.readContentsAsString(f1);
+        String[] a1=a.split(" ");
+        for(int i=0;i<a1.length;i++){
+            a1[i]=a1[i].replace(" ","");
+        }
+        for(String id:a1){
+            hs2.add(id);
+        }
+
+        HashMap<String,String> hs=indexNameMap();
+        for(String id:Bids){
+            Blob b=Utils.readObject(new File(BLOB_DIR+"/"+id.substring(0,6)+"/"+id),Blob.class);
+           String name=b.GetName();
+           String i=b.GetId();
+            if(!hs.containsKey(name)&&!hs.containsValue(i)){
+               index.add(id);
+            }if(hs2.contains(id)){
+                index.remove(id);
+            }
+
+        }
+
+    }
 //把add-file Shal写到index
     public void WriteAddToIndex() throws IOException {
         if(ADD_FILE.exists()) {
@@ -36,18 +77,19 @@ public class Stage implements Serializable {
                 index.add(id);
             }
         }
+
     }
 
     public void Stage() throws IOException {
         CreateWFileBlob();
         GetIndex(BLOB_DIR);
-        WriteAddFile();
+        WriteAddFile(index);
     }
 
 
 
     //把index写入add file文件里面
-    public void WriteAddFile() {
+    public void WriteAddFile(HashSet<String> index) {
         File file = new File(ADD_FILE.getAbsolutePath());
       String ids=new String();
         for(String id:index){
@@ -137,7 +179,7 @@ public class Stage implements Serializable {
                Delete(name);
                     System.out.println("delete"+name);
 
-                    WriteAddFile();
+                    WriteAddFile(index);
                 }
             }
         }
@@ -172,7 +214,7 @@ public class Stage implements Serializable {
         if(index.contains(shal)) {
             index.remove(shal);
         }
-        WriteAddFile();
+        WriteAddFile(index);
     }
 
     //单个Blob的sha输入index里面
@@ -183,7 +225,7 @@ public class Stage implements Serializable {
         }
         Blob b = CreatOneBlob(name);
         index.add(b.GetBlobSHA1());
-        WriteAddFile();
+        WriteAddFile(index);
     }
     //通过文件名生成blob
     public Blob CreatOneBlob(String name) throws IOException {
@@ -230,6 +272,13 @@ public class Stage implements Serializable {
                 //  System.out.println(names.get(j));
                 return true;
             }
+        }
+        return false;
+    }
+    public Boolean checkfileisexeit(String n){
+        File f=new File (CWD+"/"+n);
+        if(f.exists()){
+            return true;
         }
         return false;
     }
@@ -293,7 +342,7 @@ public class Stage implements Serializable {
     //更新
     public void upDate() throws IOException {
         GetIndex(BLOB_DIR);
-        WriteAddFile();
+        WriteAddFile(index);
     }
     public static void main(String[] args) throws IOException {
         Stage stage = new Stage();

@@ -43,9 +43,9 @@ public class Commit implements Serializable {
 
 
 
-    public  Commit(String message,String parentn) throws IOException {
+    public  Commit(String message,String parentn,List<String> bids) throws IOException {
         this.message = message;
-        this.Bids = GetBidsFileLink();
+        this.Bids = GetBidsFileLink(bids);
         this.Uid = GetUSHA1();
         this.parent.add(parentn);
         this.date = new Date();
@@ -60,7 +60,7 @@ public class Commit implements Serializable {
         this.timestamp = DateToTimestamp(date);
        this.parent=new ArrayList<>();//不是很理解
      //   this.parent=null;
-        this.Bids = GetBidsFileLink();
+        this.Bids = new ArrayList<>();
         this.Uid = GetUSHA1();
     }
 
@@ -72,15 +72,15 @@ public class Commit implements Serializable {
     //得到加密哈希码；
     public String GetUSHA1() {
 
-        Uid = sha1(Getindexstring());
+        Uid = sha1(Getindexstring(),message);
         return Uid;
     }
 
     //得到指向Bids的连接，通过index就好了??add-file文件不要忘记啊
-    public List<String> GetBidsFileLink() throws IOException {
+    public List<String> GetBidsFileLink(List<String> bids) throws IOException {
         HashSet<String> indexblobs;
         ArrayList<String> indexs = new ArrayList<>();
-        Stage stage = new Stage();
+        Stage stage = new Stage(bids);
         indexblobs = stage.GetIndexs();
         for (String id : indexblobs) {
             indexs.add(id);

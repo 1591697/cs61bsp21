@@ -401,7 +401,7 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname) throws
                 System.out.println("===");
 
                 System.out.println("commit " + c1.GetUid());
-                System.out.println("Merge:" + c1.parent.get(0).substring(0, 6) + " " + c1.parent.get(1).substring(0, 6));
+                System.out.println("Merge:" + c1.parent.get(0).substring(0, 7) + " " + c1.parent.get(1).substring(0, 7));
                 System.out.println("Date: " + c1.Gettimestamp());
                 System.out.println(c1.GetMessage());
                 System.out.println();
@@ -918,9 +918,11 @@ return null;
         li.add(currentCommit.GetUid());
         li.add(id);
         c.parent=li;//log打印的要改
-
         c.message="Merged " +GetBreath()+" into "+branchname+".";
+        String s="Merged " +GetBreath()+" into "+branchname+".";
         c.Bids=ndis;
+        c.Uid=c.GetUSHA1();
+       // c.timestamp=c.DateToTimestamp1();
        return c;
 
 
@@ -1126,11 +1128,12 @@ File f=new File(CWD+"/"+name);
     }
     public static void main(String[] args) throws IOException {
 //init();
-        global_log(COMMIT_DIR);
+//        global_log(COMMIT_DIR);
+      //  log();
 //rmFile("2.txt");
 //        add("f.txt");
-//add("k.txt");
-//rmFile("g.txt");
+//add("h.txt");
+//rmFile("h.txt");
 //        File f1=new File(REMOVW_FILE.getAbsolutePath());
 //        HashSet<String>hs2=new HashSet<>();
 //        String a=Utils.readContentsAsString(f1);
@@ -1139,7 +1142,7 @@ File f=new File(CWD+"/"+name);
 //        commit("2");
 //        commit("3");
 //        checkout3("master",GetBeCheckoutBids());
-//        merge("b1");
+        merge("b2");
 //        String s="aa"+"\r\n"+"22";
 //        File f=new File(CWD+"88.txt");
 //        Utils.writeContents(f,s);
@@ -1147,7 +1150,7 @@ File f=new File(CWD+"/"+name);
 //        rmFile("3.txt");
 //        status();
 //        log();
-//        Creatbranch("b1");
+//        Creatbranch("b2");
 //        log();
 //        File f=new File(CWD+"/"+"1.txt");
 //        String s="111";

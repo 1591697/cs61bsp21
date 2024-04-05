@@ -32,10 +32,10 @@ public class Commit implements Serializable {
      * The message of this Commit.
      */
     public String message;
-    private String timestamp;
+    public String timestamp;
     public ArrayList<String> parent=new ArrayList<>();
     private Date date;
-    private String Uid;
+    public String Uid;
     public List<String> Bids;
     public String RemoveFile;
 
@@ -78,6 +78,7 @@ public class Commit implements Serializable {
         DateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
         return dateFormat.format(date);
     }
+
 
     //得到加密哈希码；
     public String GetUSHA1() {

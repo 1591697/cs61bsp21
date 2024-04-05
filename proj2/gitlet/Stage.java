@@ -3,9 +3,11 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static gitlet.Repository.*;
+import static gitlet.Utils.writeContents;
 
 public class Stage implements Serializable {
     public static final File CWDS = new File("C:\\Users\\Administrator\\Desktop\\gitlet\\proj2\\gitlet");
@@ -24,9 +26,9 @@ public class Stage implements Serializable {
         WriteAddToIndex();
 
 }
-    public  Stage(List<String> bis) throws IOException {
+    public  Stage(List<String> bis,String rids) throws IOException {
         WriteAddToIndex();
-        WriteBidsToIndex(bis);
+        WriteBidsToIndex(bis,rids);
     }
 //得到index的名字
     public HashMap<String,String> indexNameMap(){
@@ -38,7 +40,16 @@ public class Stage implements Serializable {
         return hs;
     }
 //得到父辈的bids
-    public void WriteBidsToIndex(List<String> Bids){
+    public void WriteBidsToIndex(List<String> Bids,String rids){
+        if(rids!=null) {
+            Blob b3 = Utils.readObject(new File(BLOB_DIR + "/" + rids.substring(0, 6) + "/" + rids), Blob.class);
+            File f = new File(REMOVW_FILE.getAbsolutePath());
+            byte[] bytes = b3.Getbytes();
+           String s=new String(bytes, StandardCharsets.UTF_8);
+           String s1=Utils.readContentsAsString(f);
+           s1=s1+" "+s;
+            writeContents(f, s1);
+        }
         //删remove里面的
         File f1=new File(REMOVW_FILE.getAbsolutePath());
         HashSet<String>hs2=new HashSet<>();

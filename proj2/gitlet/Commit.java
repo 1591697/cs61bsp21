@@ -9,11 +9,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static gitlet.Repository.OBJECTS_DIR;
-import static gitlet.Repository.COMMIT_DIR;
-import static gitlet.Repository.CWD;
+import static gitlet.Repository.*;
 import static gitlet.Utils.*;
-import static gitlet.Repository.GITLET_DIR;
 
 /**
  * Represents a gitlet commit object.
@@ -40,16 +37,17 @@ public class Commit implements Serializable {
     private Date date;
     private String Uid;
     public List<String> Bids;
+    public String RemoveFile;
 
 
-
-    public  Commit(String message,String parentn,List<String> bids) throws IOException {
+    public  Commit(String message,String parentn,List<String> bids,String rids) throws IOException {
         this.message = message;
-        this.Bids = GetBidsFileLink(bids);
+        this.Bids = GetBidsFileLink(bids,rids);
         this.Uid = GetUSHA1();
         this.parent.add(parentn);
         this.date = new Date();
         this.timestamp = DateToTimestamp(date);
+       this.RemoveFile=removefile();
 
 
     }
@@ -63,7 +61,19 @@ public class Commit implements Serializable {
         this.Bids = new ArrayList<>();
         this.Uid = GetUSHA1();
     }
+        public String removefile() throws IOException {
+            File file=new File(REMOVW_FILE.getAbsolutePath());
+            String con= Utils.readContentsAsString(file);
+            String[] s=con.split(" ");
+            for (int i=0;i<s.length;i++){
+                s[i]=s[i].replace(" ","");
+            }
 
+                Blob b=new Blob(file);
+           b.CreatBlobFolder();
+           return b.GetId();
+
+        }
     public String DateToTimestamp(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
         return dateFormat.format(date);
@@ -77,10 +87,10 @@ public class Commit implements Serializable {
     }
 
     //得到指向Bids的连接，通过index就好了??add-file文件不要忘记啊
-    public List<String> GetBidsFileLink(List<String> bids) throws IOException {
+    public List<String> GetBidsFileLink(List<String> bids,String rids) throws IOException {
         HashSet<String> indexblobs;
         ArrayList<String> indexs = new ArrayList<>();
-        Stage stage = new Stage(bids);
+        Stage stage = new Stage(bids,rids);
         indexblobs = stage.GetIndexs();
         for (String id : indexblobs) {
             indexs.add(id);

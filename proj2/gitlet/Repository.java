@@ -67,6 +67,7 @@ public class Repository {
             currentStage = new Stage();
         } catch (IOException e) {
             e.printStackTrace();
+
         }
     }
 
@@ -135,6 +136,7 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname) throws
    List<String> beids=currentCommit.Bids;
     changewkfileby(ndis,beids);
     clearaddfile();
+    clearremovefile();
 }
 
     public static void commit(String message) throws IOException {
@@ -149,11 +151,17 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname) throws
         newcommit.CreatCommitFolder();
         RecordCommit(newcommit);
        clearaddfile();
+       clearremovefile();
     }
     //清除addfile
     public static void clearaddfile(){
         String s = "";
         writeContents(ADD_FILE, s);
+        currentStage.index.clear();
+    }
+    public static void clearremovefile(){
+        String s = "";
+        writeContents(REMOVW_FILE, s);
         currentStage.index.clear();
     }
     //获取当前的breath分支
@@ -178,7 +186,7 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname) throws
     public static Commit CreatNewcommit(String message) throws IOException {
         currentCommit = GetCurrentCommit();
         String id = currentCommit.GetUid();
-        Commit c = new Commit(message, id,currentCommit.Bids);
+        Commit c = new Commit(message, id,currentCommit.Bids,currentCommit.RemoveFile);
         return c;
     }
 
@@ -567,7 +575,15 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname) throws
 
     //第二种
     public static void checkout2(String id, String name) throws IOException {
-        File f = new File(COMMIT_DIR + "/" + id.substring(0, 6) + "/" + id);
+        File f2 = new File(COMMIT_DIR + "/" + id.substring(0, 6));
+      ArrayList<File> a=new ArrayList<>();
+        for(File f1:f2.listFiles()){
+            if(!f1.isDirectory()){
+               a.add(f1);
+            }
+        }
+
+        File f= a.get(0);
         Commit c = Utils.readObject(f, Commit.class);
         List<String> ids = c.Bids;
 
@@ -608,7 +624,6 @@ return null;
     //将Blob 里面的文件反写
     public static void writeBlobfile(Blob b){
         File f=new File(CWD+"/"+b.GetName());
-
         byte[] bytes=b.Getbytes();
         writeContents(f,new String(bytes, StandardCharsets.UTF_8));
     }
@@ -624,28 +639,30 @@ return null;
     //
     public static void changewkfileby(List<String>cids,List<String> beids ) throws IOException {
 
-        HashSet<String> ids=new HashSet<>();
-        HashSet<String> ids2=new HashSet<>();
-        for(String s:cids){
+        HashSet<String> ids = new HashSet<>();
+        HashSet<String> ids2 = new HashSet<>();
+        for (String s : cids) {
             ids.add(s);
         }
-        for(String s:cids){
+        for (String s : cids) {
             ids2.add(s);
         }
         //剔除不属于的
-        for(String id:beids){
-            if(!ids.contains(id)){
-                File f=new File(BLOB_DIR+"/"+id.substring(0,6)+"/"+id);
-                Blob b=Utils.readObject(f,Blob.class);
-                String name= b.GetName();
-                File f1=new File(CWD+"/"+name);
-                f1.delete();
-                GetworkFiles();
-            }
+        if (beids!=null&&!beids.isEmpty()){
+            for (String id : beids) {
+                if (!ids.contains(id)) {
+                    File f = new File(BLOB_DIR + "/" + id.substring(0, 6) + "/" + id);
+                    Blob b = Utils.readObject(f, Blob.class);
+                    String name = b.GetName();
+                    File f1 = new File(CWD + "/" + name);
+                    f1.delete();
+                    GetworkFiles();
+                }
 //            if(ids.contains(id)){
 //                ids.remove(id);
 //            }
-        }
+            }
+    }
         updategetfile();
         HashSet<File> hsf=GetworkFilesList(CWD);
         for(File f1:hsf){
@@ -794,6 +811,7 @@ return null;
         HashMap<Integer,String> hm=new HashMap<>();
        Commit c=Getcommit(id);
        int i=0;
+        hm.put(i++,c.GetUid());
        while(!c.parent.isEmpty()){
            hm.put(i++,c.parent.get(c.parent.size()-1));
            c=Getcommit(c.parent.get(c.parent.size()-1));
@@ -1108,13 +1126,20 @@ File f=new File(CWD+"/"+name);
     }
     public static void main(String[] args) throws IOException {
 //init();
+        global_log(COMMIT_DIR);
 //rmFile("2.txt");
-//        add("2.txt");
-//add("1.txt");
-//////rmFile("2.txt");
+//        add("f.txt");
+//add("k.txt");
+//rmFile("g.txt");
+//        File f1=new File(REMOVW_FILE.getAbsolutePath());
+//        HashSet<String>hs2=new HashSet<>();
+//        String a=Utils.readContentsAsString(f1);
+//        System.out.println(a);
 //      commit("1");
-        checkout3("other",GetBeCheckoutBids());
-//        merge("other");
+//        commit("2");
+//        commit("3");
+//        checkout3("master",GetBeCheckoutBids());
+//        merge("b1");
 //        String s="aa"+"\r\n"+"22";
 //        File f=new File(CWD+"88.txt");
 //        Utils.writeContents(f,s);
@@ -1122,7 +1147,7 @@ File f=new File(CWD+"/"+name);
 //        rmFile("3.txt");
 //        status();
 //        log();
-//        Creatbranch("other");
+//        Creatbranch("b1");
 //        log();
 //        File f=new File(CWD+"/"+"1.txt");
 //        String s="111";

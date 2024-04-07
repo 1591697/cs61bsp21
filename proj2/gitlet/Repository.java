@@ -70,7 +70,6 @@ public class Repository {
 
         }
     }
-
     static Tree currentTree = new Tree();
     static Vertex currentVertex = new Vertex();
 
@@ -113,7 +112,8 @@ public class Repository {
     public static void add(String name) throws IOException {
         // currentStage.upDate();
         if (currentStage.checkfileisexeit(name)) {
-            currentStage.GetOneIndex(name);
+            currentCommit=GetCurrentCommit();
+            currentStage.GetOneIndex(name,currentCommit.Bids);
         } else {
             System.out.println("File does not exist.");
             System.exit(0);
@@ -126,7 +126,7 @@ public class Repository {
         currentCommit.CreatCommitFolder();
     }
 //这段有问题，编译不成功。
-public  static void mergecommit(ArrayList<String> ndis,String branchname) throws IOException {
+public  static void mergecommit(ArrayList<String> ndis,String branchname,ArrayList<String> ndis2) throws IOException {
    // CheckCommit(message);
     String s=GetBreath();
     Commit newcommit = CreatMergeCommit(ndis,branchname);
@@ -137,8 +137,19 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname) throws
     changewkfileby(ndis,beids);
     clearaddfile();
     clearremovefile();
+//    if(ndis2!=null&&!ndis2.isEmpty()){
+//        CreateFileByNames(ndis2);
+//    }
 }
-
+//通过名字生成
+    public static void CreateFileByNames(ArrayList<String> nids2) throws IOException {
+        for(String id:nids2){
+            if(id!=null){
+                File f=join(CWD,id);
+                f.createNewFile();
+            }
+        }
+    }
     public static void commit(String message) throws IOException {
         CheckCommit(message);
 //        if (COMMIT_DIR.listFiles().length == 0) {
@@ -401,7 +412,7 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname) throws
                 System.out.println("===");
 
                 System.out.println("commit " + c1.GetUid());
-                System.out.println("Merge:" + c1.parent.get(0).substring(0, 7) + " " + c1.parent.get(1).substring(0, 7));
+                System.out.println("Merge: " + c1.parent.get(0).substring(0, 7) + " " + c1.parent.get(1).substring(0, 7));
                 System.out.println("Date: " + c1.Gettimestamp());
                 System.out.println(c1.GetMessage());
                 System.out.println();
@@ -575,6 +586,7 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname) throws
 
     //第二种
     public static void checkout2(String id, String name) throws IOException {
+
         File f2 = new File(COMMIT_DIR + "/" + id.substring(0, 6));
       ArrayList<File> a=new ArrayList<>();
         for(File f1:f2.listFiles()){
@@ -642,10 +654,14 @@ return null;
         HashSet<String> ids = new HashSet<>();
         HashSet<String> ids2 = new HashSet<>();
         for (String s : cids) {
-            ids.add(s);
+            if(s!=null) {
+                ids.add(s);
+            }
         }
         for (String s : cids) {
-            ids2.add(s);
+            if(s!=null) {
+                ids2.add(s);
+            }
         }
         //剔除不属于的
         if (beids!=null&&!beids.isEmpty()){
@@ -839,7 +855,7 @@ return null;
         String sid= Getbranchesdeepfist(branchname);
         currentCommit=GetCurrentCommit();
         if(sid.equals(currentCommit.GetUid())){
-            Utils.writeContents(HEAD_FILE,branchname);
+            checkout3(branchname,GetBeCheckoutBids());
             System.out.println("Current branch fast-forwarded.");
             System.exit(0);
 
@@ -918,7 +934,7 @@ return null;
         li.add(currentCommit.GetUid());
         li.add(id);
         c.parent=li;//log打印的要改
-        c.message="Merged " +GetBreath()+" into "+branchname+".";
+        c.message="Merged " +branchname+" into "+GetBreath()+".";
         String s="Merged " +GetBreath()+" into "+branchname+".";
         c.Bids=ndis;
         c.Uid=c.GetUSHA1();
@@ -939,22 +955,27 @@ return null;
 
         HashSet<String> hs=new HashSet<>();
         for(String id:ids){
-            hs.add(Getblob(id).GetName());
+            if(id!=null) {
+                hs.add(Getblob(id).GetName());
+            }
         }
         return hs;
     }
-    //得到name ,id 的hashmap
+    //得到name,id 的hashmap
     public static HashMap<String,String> GetHashmapNameId(HashSet<String> ids){
 
         HashMap<String,String> hs=new HashMap<>();
-        for(String id:ids){
-            Blob b=Getblob(id);
-            hs.put(b.GetName(),b.GetId());
+        for(String id:ids) {
+            if (!id.equals("")) {
+                Blob b = Getblob(id);
+                hs.put(b.GetName(), b.GetId());
+            }
         }
         return hs;
     }
    //冲突
     public static String ConfitMerge(HashMap<String,String> bidsnameid,String name,HashMap<String,String> cidsnameid) throws IOException {
+     System.out.println("Encountered a merge conflict.");
       String id1=  bidsnameid.get(name);
         String id2=  cidsnameid.get(name);
 File f=new File(CWD+"/"+name);
@@ -968,14 +989,49 @@ File f=new File(CWD+"/"+name);
         byte[] bytes2=b2.Getbytes();
         writeContents(f,new String(bytes2, StandardCharsets.UTF_8));
         String content2= readContentsAsString(f);
-        String conflictContents = "<<<<<<< HEAD" +"\r\n"+ content2 +"\r\n"+"======="+"\r\n" +  content1 + "\r\n"+">>>>>>>"+"\r\n";
+        String conflictContents = "<<<<<<< HEAD" +"\r\n"+ content2 +"======="+"\r\n" +  content1 +">>>>>>>"+"\r\n";
         writeContents(f,conflictContents);
         Blob b=new Blob(f);
         b.CreatBlobFolder();
         return b.GetId();
     }
+    public static String ConfitMergeC(String name,HashMap<String,String> cidsnameid) throws IOException {
+        System.out.println("Encountered a merge conflict.");
+        String id2=  cidsnameid.get(name);
+        File f=new File(CWD+"/"+name);
+        Blob b2=Getblob(id2);
+        String content1= readContentsAsString(f);
+        byte[] bytes2=b2.Getbytes();
+        writeContents(f,new String(bytes2, StandardCharsets.UTF_8));
+        String content2= readContentsAsString(f);
+        String conflictContents = "<<<<<<< HEAD" +"\r\n"+ content2 +"======="+"\r\n" +">>>>>>>"+"\r\n";
+        writeContents(f,conflictContents);
+        Blob b=new Blob(f);
+        b.CreatBlobFolder();
+        return b.GetId();
+    }
+    public static String ConfitMergeB(HashMap<String,String> bidsnameid,String name) throws IOException {
+        System.out.println("Encountered a merge conflict.");
+        String id1=  bidsnameid.get(name);
+
+        File f=new File(CWD+"/"+name);
+        Blob b1=Getblob(id1);
+
+        //  File f=new File(CWD+"/"+b.GetName());
+
+        byte[] bytes=b1.Getbytes();
+        writeContents(f,new String(bytes, StandardCharsets.UTF_8));
+        String content1= readContentsAsString(f);
+        String conflictContents = "<<<<<<< HEAD" +"\r\n" +"======="+"\r\n" +  content1 +">>>>>>>"+"\r\n";
+        writeContents(f,conflictContents);
+        Blob b=new Blob(f);
+        b.CreatBlobFolder();
+        return b.GetId();
+    }
+
     public static void merge(String branchname) throws IOException {
         ArrayList<String> nids=new ArrayList<>();
+        ArrayList<String> nids2=new ArrayList<>();
        String s=readContentsAsString(ADD_FILE) ;
         if(!s.isEmpty()){
             System.out.println("You have uncommitted changes.");
@@ -1022,7 +1078,7 @@ File f=new File(CWD+"/"+name);
             //第二次
             if(!checkHashsetSize(sids)){
                 for(String name:sidsname){
-                    if(bidsname.contains(name)&&cidsname.contains(name)){
+                    if(bidsname.contains(name)&&cidsname.contains(name)&&bidsnameid.get(name)!=null&&cidsnameid.get(name)!=null){
                         if(bidsnameid.get(name).equals(cidsnameid.get(name))&&!bidsnameid.get(name).equals(sidsnameid.get(name))){
                             nids.add(bidsnameid.get(name));
                             //sidsname.remove(name);
@@ -1032,7 +1088,7 @@ File f=new File(CWD+"/"+name);
                             cidsnameid.remove(name);
                             bidsnameid.remove(name);
                         }
-                        if(!bidsnameid.get(name).equals(cidsnameid.get(name))&&bidsnameid.get(name).equals(sidsnameid.get(name))){
+                      else  if(!bidsnameid.get(name).equals(cidsnameid.get(name))&&bidsnameid.get(name).equals(sidsnameid.get(name))){
                             nids.add(cidsnameid.get(name));
                            // sidsname.remove(name);
                             bidsname.remove(name);
@@ -1041,7 +1097,7 @@ File f=new File(CWD+"/"+name);
                             cidsnameid.remove(name);
                             bidsnameid.remove(name);
                         }
-                        if(!bidsnameid.get(name).equals(cidsnameid.get(name))&&cidsnameid.get(name).equals(sidsnameid.get(name))){
+                     else   if(!bidsnameid.get(name).equals(cidsnameid.get(name))&&cidsnameid.get(name).equals(sidsnameid.get(name))){
                             nids.add(bidsnameid.get(name));
                          //   sidsname.remove(name);
                             bidsname.remove(name);
@@ -1050,22 +1106,35 @@ File f=new File(CWD+"/"+name);
                             cidsnameid.remove(name);
                             bidsnameid.remove(name);
                         }
-                        if(!bidsnameid.get(name).equals(cidsnameid.get(name))&&!bidsnameid.get(name).equals(sidsnameid.get(name))&&!cidsnameid.get(name).equals(sidsnameid.get(name))){
+                      else if(!bidsnameid.get(name).equals(cidsnameid.get(name))&&!bidsnameid.get(name).equals(sidsnameid.get(name))&&!cidsnameid.get(name).equals(sidsnameid.get(name))){
                           //冲突
                           nids.add(ConfitMerge(bidsnameid,name,cidsnameid))  ;
                             bidsname.remove(name);
                             cidsname.remove(name);
                             bidsnameid.remove(name);
                             cidsnameid.remove(name);
+
                             //去除bnanelimiand
                         }
 
 
                     }
+
                     if(bidsname.contains(name)&&!cidsname.contains(name)&&bidsnameid.get(name).equals(sidsnameid.get(name))){
                      //   nids.add(bidsnameid.get(name));
                     //    sidsname.remove(name);
                         //改
+                        nids2.add(name);
+                        bidsname.remove(name);
+                        sidsnameid.remove(name);
+                        bidsnameid.remove(name);
+                    }
+                    if(bidsname.contains(name)&&!cidsname.contains(name)&&!bidsnameid.get(name).equals(sidsnameid.get(name))){
+                        //   nids.add(bidsnameid.get(name));
+                        //    sidsname.remove(name);
+                        //改
+                        nids.add(ConfitMergeB(bidsnameid,name))  ;
+                        nids2.add(name);
                         bidsname.remove(name);
                         sidsnameid.remove(name);
                         bidsnameid.remove(name);
@@ -1073,12 +1142,23 @@ File f=new File(CWD+"/"+name);
                     if(!bidsname.contains(name)&&cidsname.contains(name)&&cidsnameid.get(name).equals(sidsnameid.get(name))){
 
                      //   sidsname.remove(name);
+                        nids2.add(name);
+                        cidsname.remove(name);
+                        sidsnameid.remove(name);
+                        cidsnameid.remove(name);
+                    }
+                    if(!bidsname.contains(name)&&cidsname.contains(name)&&!cidsnameid.get(name).equals(sidsnameid.get(name))){
+
+                        //   sidsname.remove(name);
+                        nids.add(ConfitMergeC(name,cidsnameid))  ;
+                        nids2.add(name);
                         cidsname.remove(name);
                         sidsnameid.remove(name);
                         cidsnameid.remove(name);
                     }
                     if(!bidsname.contains(name)&&!cidsname.contains(name)){
                    //     sidsname.remove(name);
+                        nids2.add(name);
                         sidsnameid.remove(name);
                     }
 
@@ -1092,6 +1172,12 @@ File f=new File(CWD+"/"+name);
                             if(bidsnameid.get(name).equals(cidsnameid.get(name))){
                                 nids.add(cidsnameid.get(name));
                            //     bidsname.remove(name);
+                                bidsnameid.remove(name);
+                                cidsname.remove(name);
+                                cidsnameid.remove(name);
+                            }
+                            else{
+                                nids.add(ConfitMergeC(name,cidsnameid))  ;
                                 bidsnameid.remove(name);
                                 cidsname.remove(name);
                                 cidsnameid.remove(name);
@@ -1116,36 +1202,34 @@ File f=new File(CWD+"/"+name);
 
 
         }
-        mergecommit(nids,branchname);
+        mergecommit(nids,branchname,nids2);
 
     }
     public static void checkinit(){
         File f=new File(CWD+"/"+".gitlet");
-        if(f.exists()){
+        if(!f.exists()){
             System.out.println("Not in an initialized Gitlet directory.");
             System.exit(0);
         }
     }
     public static void main(String[] args) throws IOException {
 //init();
-//        global_log(COMMIT_DIR);
-      //  log();
-//rmFile("2.txt");
-//        add("f.txt");
+//        add("h.txt");
 //add("h.txt");
-//rmFile("h.txt");
+//rmFile("g.txt");
 //        File f1=new File(REMOVW_FILE.getAbsolutePath());
 //        HashSet<String>hs2=new HashSet<>();
 //        String a=Utils.readContentsAsString(f1);
 //        System.out.println(a);
+//        status();
 //      commit("1");
 //        commit("2");
 //        commit("3");
 //        checkout3("master",GetBeCheckoutBids());
-        merge("b2");
-//        String s="aa"+"\r\n"+"22";
-//        File f=new File(CWD+"88.txt");
-//        Utils.writeContents(f,s);
+//        checkout3("b2",GetBeCheckoutBids());
+//        log();
+
+//
 //        rmFile("3.txt");
 //        rmFile("3.txt");
 //        status();

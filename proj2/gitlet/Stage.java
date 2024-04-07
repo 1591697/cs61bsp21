@@ -227,14 +227,51 @@ public class Stage implements Serializable {
         }
         WriteAddFile(index);
     }
+    //调用对比remove文件有没有
+    public boolean CheckRemoveFileHasSameId(Blob b){
+        File f1=new File(REMOVW_FILE.getAbsolutePath());
+        HashSet<String>hs2=new HashSet<>();
+        String a=Utils.readContentsAsString(f1);
+        String[] a1=a.split(" ");
+        for(int i=0;i<a1.length;i++){
+            a1[i]=a1[i].replace(" ","");
+        }
+        for(String id:a1){
+            hs2.add(id);
+        }
+        String id=b.GetId();
+        if(hs2.contains(id)) {
+            hs2.remove(id);
+            String s = new String();
+            for (String ids : hs2) {
+                s = s + ids;
+            }
+            Utils.writeContents(f1, s);
+            return true;
+        }
+        return false;
+    }
 
     //单个Blob的sha输入index里面
-    public void GetOneIndex(String name) throws IOException {
+    public void GetOneIndex(String name,List<String> bids) throws IOException {
         if (SearchObjectBlob(BLOB_DIR, name)) {
           Delete(name);
           Blobs.clear();
         }
         Blob b = CreatOneBlob(name);
+        if(CheckRemoveFileHasSameId(b)){
+            return;
+        }
+        if(bids!=null&&!bids.isEmpty()) {
+            HashSet<String> hs1 = new HashSet<>();
+            for (String id : bids) {
+                hs1.add(id);
+            }
+            if (hs1.contains(b.GetId())) {
+                return;
+            }
+        }
+
         index.add(b.GetBlobSHA1());
         WriteAddFile(index);
     }

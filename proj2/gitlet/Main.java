@@ -29,6 +29,7 @@ public class Main {
                 break;
                 // TODO: handle the `init` command
             case "add":
+                Repository.checkinit();
                 validArgs(args, 2);
 
                 try {
@@ -40,6 +41,7 @@ public class Main {
                 // TODO: handle the `add [filename]` command
                 break;
             case "commit":
+                Repository.checkinit();
                 validArgs(args, 2);
 
                 try {
@@ -51,6 +53,7 @@ public class Main {
             // TODO: FILL THE REST IN
 
             case "rm":
+                Repository.checkinit();
                 validArgs(args, 2);
 
                 try {
@@ -60,6 +63,7 @@ public class Main {
                 }
                 break;
             case "log":
+                Repository.checkinit();
                 validArgs(args, 1);
 
                 try {
@@ -69,16 +73,19 @@ public class Main {
                 }
                 break;
             case "global-log":
+                Repository.checkinit();
                 validArgs(args, 1);
 
                 Repository.global_log(COMMIT_DIR);
                 break;
             case "find":
+                Repository.checkinit();
                 validArgs(args, 2);
 
                 Repository.find(args[1]);
                 break;
             case "status":
+                Repository.checkinit();
                 validArgs(args, 1);
 
                 try {
@@ -88,7 +95,7 @@ public class Main {
                 }
                 break;
             case "checkout":
-
+                Repository.checkinit();
                 if (args.length == 3) {
                     if (!args[1].equals("--")) {
                         System.out.println("Incorrect operands.");
@@ -132,6 +139,7 @@ public class Main {
                 }
                 break;
             case "branch":
+                Repository.checkinit();
                 validArgs(args, 2);
 
 
@@ -142,11 +150,13 @@ public class Main {
                 }
                 break;
             case "rm-branch":
+                Repository.checkinit();
                 validArgs(args, 2);
 
                 Repository.detelebranch(args[1]);
                 break;
             case "reset":
+                Repository.checkinit();
                 validArgs(args, 2);
 
                 try {
@@ -156,6 +166,7 @@ public class Main {
                 }
                 break;
             case "merge":
+                Repository.checkinit();
                 validArgs(args, 2);
 
                 try {
@@ -164,6 +175,9 @@ public class Main {
                     e.printStackTrace();
                 }
                 break;
+            default:
+                System.out.println("No command with that name exists.");
+                System.exit(0);
 
         }
     }

@@ -130,11 +130,13 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname,ArrayLi
    // CheckCommit(message);
     String s=GetBreath();
     Commit newcommit = CreatMergeCommit(ndis,branchname);
+
+    currentCommit=GetCurrentCommit();
+    List<String> beids=currentCommit.Bids;
+    changewkfileby(ndis,beids);
     newcommit.CreatCommitFolder();
     RecordCommit(newcommit);
-    currentCommit=GetCurrentCommit();
-   List<String> beids=currentCommit.Bids;
-    changewkfileby(ndis,beids);
+
     clearaddfile();
     clearremovefile();
 //    if(ndis2!=null&&!ndis2.isEmpty()){
@@ -550,6 +552,7 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname,ArrayLi
             File f = new File(BLOB_DIR + "/" + id.substring(0, 6) + "/" + id);
             Blob b = Utils.readObject(f, Blob.class);
             if (b.GetName().equals(name)) {
+
                 return b;
             }
         }
@@ -588,7 +591,26 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname,ArrayLi
     public static void checkout2(String id, String name) throws IOException {
 
         File f2 = new File(COMMIT_DIR + "/" + id.substring(0, 6));
+        if(f2==null&&!f2.exists()){
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+//        int i=0;
+//       HashSet<File>hsf= GetworkFilesList(CWD);
+//       for(File f:hsf){
+//           if(f.getName().equals(name)){
+//               i=1;
+//           }
+//       }
+//       if(i!=1){
+//           System.out.println(" File does not exist in that commit.");
+//           System.exit(0);
+//       }
       ArrayList<File> a=new ArrayList<>();
+        if(f2.listFiles()==null){
+            System.out.println(" No commit with that id exists.");
+            System.exit(0);
+        }
         for(File f1:f2.listFiles()){
             if(!f1.isDirectory()){
                a.add(f1);
@@ -604,7 +626,8 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname,ArrayLi
             HashSet<File> hf = currentStage.GetworkFilesList(CWD);
             changewffile(b1, hf, name);
         } else {
-            System.out.println("No commit with that id exists.");
+
+            System.out.println(" File does not exist in that commit.");
             System.exit(0);
         }
     }
@@ -619,6 +642,18 @@ public  static void mergecommit(ArrayList<String> ndis,String branchname,ArrayLi
         String head = Utils.readContentsAsString(HEAD_FILE);
         if (head.equals(branchname)) {
             System.out.println("No need to checkout the current branch.");
+            return false;
+        }
+        return true;
+    }
+    public static Boolean checkbranchF(String branchname) {
+        File f = new File(HEADS_DIR + "/" + branchname);
+        if (!f.exists()) {
+
+            return false;
+        }
+        String head = Utils.readContentsAsString(HEAD_FILE);
+        if (head.equals(branchname)) {
             return false;
         }
         return true;
@@ -1033,18 +1068,19 @@ File f=new File(CWD+"/"+name);
         ArrayList<String> nids=new ArrayList<>();
         ArrayList<String> nids2=new ArrayList<>();
        String s=readContentsAsString(ADD_FILE) ;
+        if(branchname.equals(GetBreath())){
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
         if(!s.isEmpty()){
             System.out.println("You have uncommitted changes.");
             System.exit(0);
         }
-       if(!checkbranch(branchname)) {
+       if(!checkbranchF(branchname)) {
            System.out.println("A branch with that name does not exist.");
            System.exit(0);
        }
-       if(branchname.equals(GetBreath())){
-           System.out.println("Cannot merge a branch with itself.");
-           System.exit(0);
-       }
+
 
         if(!branchname.equals(GetBreath())) {
             checkmerge(branchname);
@@ -1099,7 +1135,6 @@ File f=new File(CWD+"/"+name);
                         }
                      else   if(!bidsnameid.get(name).equals(cidsnameid.get(name))&&cidsnameid.get(name).equals(sidsnameid.get(name))){
                             nids.add(bidsnameid.get(name));
-                         //   sidsname.remove(name);
                             bidsname.remove(name);
                             cidsname.remove(name);
                             sidsnameid.remove(name);
@@ -1198,6 +1233,15 @@ File f=new File(CWD+"/"+name);
                     }
 
                 }
+            if(bidsnameid.size()!=0&&cidsnameid.size()==0){
+                for(String name:bidsname){
+                    nids.add(bidsnameid.get(name));
+                    //  cidsname.remove(name);
+                    bidsnameid.remove(name);
+                }
+
+            }
+
 
 
 
@@ -1215,7 +1259,10 @@ File f=new File(CWD+"/"+name);
     public static void main(String[] args) throws IOException {
 //init();
 //        add("h.txt");
-//add("h.txt");
+//add("b.txt");
+//commit("2");
+        merge("master");
+//        Creatbranch("b1");
 //rmFile("g.txt");
 //        File f1=new File(REMOVW_FILE.getAbsolutePath());
 //        HashSet<String>hs2=new HashSet<>();
@@ -1226,15 +1273,15 @@ File f=new File(CWD+"/"+name);
 //        commit("2");
 //        commit("3");
 //        checkout3("master",GetBeCheckoutBids());
-//        checkout3("b2",GetBeCheckoutBids());
+      //  checkout3("b1",GetBeCheckoutBids());
 //        log();
-
+//merge("b1");
 //
 //        rmFile("3.txt");
 //        rmFile("3.txt");
 //        status();
 //        log();
-//        Creatbranch("b2");
+//
 //        log();
 //        File f=new File(CWD+"/"+"1.txt");
 //        String s="111";
